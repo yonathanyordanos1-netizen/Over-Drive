@@ -189,11 +189,14 @@ Config.Layout = {
 	BaseHeight = 1080,
 	MinScale = 0.5,
 	MaxScale = 1.35,
-	PhoneMaxWidth = 700,
-	TabletMaxWidth = 1100,
+	-- Device class is decided by the viewport's SHORT side, not its width.
+	-- Roblox runs phones in landscape by default, so an 812x375 handset is wide
+	-- enough to pass for a tablet by width alone and would be scaled like one.
+	PhoneMaxShortSide = 500,
+	TabletMaxShortSide = 820,
 	PhoneScaleBoost = 1.55,
 	TabletScaleBoost = 1.3,
-	ScreenPadding = 28,
+	ScreenPadding = 44,
 	MinTouchTarget = 44, -- pixels, before scaling
 
 	--[[
@@ -202,26 +205,57 @@ Config.Layout = {
 		Scaling off viewport height alone breaks on a landscape handset, which is
 		how most Roblox mobile play actually happens: 812x375 would produce a
 		scale near 0.35 and text around 5px. The floor keeps text legible there.
-		The ceiling exists because a 268px item card has to fit inside a 375px
-		portrait screen -- above roughly 1.15 it no longer does.
 	]]
 	PhoneMinScale = 0.75,
 	PhoneMaxScale = 1.15,
+
+	-- Lobby layout. Content lives in the left part of the screen; the figure
+	-- stands right of centre and nothing is ever drawn across it.
+	TopBarHeight = 76,
+	FooterHeight = 48,
+	ContentWidth = 600, -- single-column tabs (Progress, Settings)
+	SlotColumnWidth = 300, -- loadout slot list
+	PickerColumnWidth = 340, -- loadout item picker / store list
+	DetailColumnWidth = 320, -- store detail pane
+	PanelTransparency = 0.22,
 }
 
 -- ===========================================================================
 -- Menu camera (slow orbit over the placeholder stage)
 -- ===========================================================================
 
+--[[
+	The camera frames the player's own character standing on the stage, the way
+	a lobby in a modern shooter does.
+
+	It sways through a narrow arc rather than orbiting all the way round: a full
+	orbit would spend half its time looking at the back of the figure's head.
+	The sway keeps the figure near front-on at all times while still moving
+	enough that the menu never looks like a still image.
+]]
 Config.MenuCamera = {
 	StageName = "MenuStage",
-	OrbitRadius = 54,
-	OrbitHeight = 22,
-	OrbitSeconds = 90, -- one full revolution
-	LookHeight = 6,
-	FieldOfView = 62,
-	DriftAmplitude = 2.5, -- gentle vertical bob
-	DriftSeconds = 11,
+	StandName = "AvatarStand",
+
+	-- Framed for the 7.66-stud operator from CharacterSetup. Distance, height
+	-- and offset all grew by the same ratio as the body (x1.4), so the figure
+	-- fills the same share of the screen as the old 5.46-stud avatar did.
+	Distance = 23.5,
+	Height = 7.2,
+	LookHeight = 3.6, -- low enough that the whole figure, feet included, is in frame
+	FieldOfView = 34, -- long lens: flattens the figure and calms the background
+
+	-- Slides the view sideways so the figure sits right of centre, leaving the
+	-- left of the screen for the lobby panels, the way a CoD lobby is composed.
+	FrameOffset = 3.9,
+
+	SwayDegrees = 9,
+	SwaySeconds = 26,
+	DriftAmplitude = 0.35,
+	DriftSeconds = 13,
+
+	-- Where the figure stands if the stage is missing entirely.
+	FallbackCentre = Vector3.new(0, 788, 0),
 }
 
 -- ===========================================================================
